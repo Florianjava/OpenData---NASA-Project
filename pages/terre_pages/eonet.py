@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # Fonction pour récupérer les événements depuis l'API EONET
-def fetch_eonet_data():
+def fetch_eonet_data(limit):
     url = "https://eonet.gsfc.nasa.gov/api/v2.1/events"
     params = {
         'status': 'all',  # Obtenir tous les événements
-        'limit': 100,  # Limite des événements (tu peux ajuster selon tes besoins)
+        'limit': limit,  # Limite des événements (tu peux ajuster selon tes besoins)
     }
     response = requests.get(url, params=params)
     if response.status_code == 200:
@@ -152,9 +152,10 @@ def display_time_series(df_count):
 def display():
     st.title("Événements EONET")
     
+    limit = st.slider('Sélectionnez le nombre d\'événements à afficher', min_value=10, max_value=1000, value=100, step=10)
 
     # Récupérer les événements EONET
-    events = fetch_eonet_data()
+    events = fetch_eonet_data(limit=limit)
 
     if events:
         st.write(f"Nombre d'événements trouvés : {len(events)}")

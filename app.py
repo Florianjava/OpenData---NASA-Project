@@ -40,13 +40,15 @@ if st.session_state.menu == "Accueil":
 
 elif st.session_state.menu == "Terre":
    
-    col1, col2, col3 = st.columns([1, 1, 1]) 
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1]) 
     with col1:
         sub_menu_1 = st.button("Terre - Accueil")
     with col2:
         sub_menu_2 = st.button("Earth")
     with col3:
         sub_menu_3 = st.button("EONET")
+    with col4 :
+        sub_menu_4 = st.button("NEOS")
 
 
 
@@ -56,6 +58,8 @@ elif st.session_state.menu == "Terre":
         st.session_state.sub_menu = "Earth"
     elif sub_menu_3 :
         st.session_state.sub_menu = "EONET"
+    elif sub_menu_4 :
+        st.session_state.sub_menu = "NEOS"
 
 
 
@@ -71,6 +75,9 @@ elif st.session_state.menu == "Terre":
     elif st.session_state.sub_menu == "EONET":  
         from pages.terre_pages.eonet import display
         display()  
+    elif st.session_state.sub_menu == 'NEOS' :
+        from pages.terre_pages.neos import display
+        display()
 
 
 
