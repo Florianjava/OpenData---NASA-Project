@@ -96,7 +96,15 @@ def display_eonet_map(events):
             ).add_to(marker_cluster)
 
     # Afficher la carte dans Streamlit
-    st.components.v1.html(m._repr_html_(), width=900, height=600)
+    map_html = f"""
+    <div style="width: 100%; height: 400px;">
+        {m._repr_html_()}
+    </div>
+    """
+    
+    # Afficher la carte dans Streamlit
+    st.components.v1.html(map_html, height=600, scrolling=False)
+    #st.components.v1.html(m._repr_html_(), width=900, height=600)
 
 # Fonction pour analyser les événements et générer des séries temporelles
 def generate_time_series(events):
@@ -126,7 +134,7 @@ def generate_time_series(events):
 
         return df_count
     else:
-        st.write("Aucun événement à analyser.")
+        st.write("No event to analyze.")
         return None
 
 # Fonction pour afficher les séries temporelles
@@ -148,7 +156,7 @@ def display_time_series(df_count):
             "Water Color": "green",  # Couleur de l'eau
         }
         # Afficher la série temporelle par catégorie
-        st.subheader("Nombre d'événements par catégorie au fil du temps")
+        st.subheader("Number of event per category")
 
         # Créer une figure plus petite
         fig, ax = plt.subplots(figsize=(18, 10))
@@ -156,9 +164,9 @@ def display_time_series(df_count):
 
         df_count.plot(ax=ax, color=colors)
         
-        ax.set_title("Nombre d'événements par type au fil du temps")
+        ax.set_title("Number of event in function of the time")
         ax.set_xlabel("Date")
-        ax.set_ylabel("Nombre d'événements")
+        ax.set_ylabel("Number of event")
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         plt.xticks(rotation=45)
@@ -168,15 +176,15 @@ def display_time_series(df_count):
 
 # Fonction qui sera appelée dans la page EONET
 def display():
-    st.title("Événements EONET")
+    st.title("Earth Observatory Natural Events Tracker : EONET")
     
-    limit = st.slider('Sélectionnez le nombre d\'événements à afficher', min_value=10, max_value=1000, value=100, step=10)
+    limit = st.slider('Select a limit of event to fetch', min_value=10, max_value=1000, value=100, step=10)
 
     # Récupérer les événements EONET
     events = fetch_eonet_data(limit=limit)
 
     if events:
-        st.write(f"Nombre d'événements trouvés : {len(events)}")
+        st.write(f"Number of element found : {len(events)}")
 
         # Créer deux colonnes pour afficher la carte et le graphique côte à côte
         col1, col2 = st.columns([4, 2])  # Colonne 1 pour la carte (plus large), Colonne 2 pour le graphique
@@ -193,7 +201,7 @@ def display():
                 fig = display_time_series(df_count)
                 st.pyplot(fig)
     else:
-        st.write("Aucun événement disponible ou erreur de chargement.")
+        st.write("No event available.")
 
 
    
