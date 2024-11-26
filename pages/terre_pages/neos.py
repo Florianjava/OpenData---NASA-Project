@@ -42,19 +42,50 @@ def plot_miss_distance(df):
 def filter_data(df):
     st.sidebar.title("Filtres de données")
     
-    # Filtres sur la variable "miss_distance"
-    min_miss_distance = st.sidebar.number_input("Miss Distance min", min_value=float(df['miss_distance'].min()), max_value=float(df['miss_distance'].max()), value=float(df['miss_distance'].min()))
-    max_miss_distance = st.sidebar.number_input("Miss Distance max", min_value=float(df['miss_distance'].min()), max_value=float(df['miss_distance'].max()), value=float(df['miss_distance'].max()))
-    
-    # Appliquer le filtre
+    # Filtre sur miss_distance (range slider)
+    miss_distance_range = st.sidebar.slider(
+        "Distance (min et max)",
+        min_value=float(df['miss_distance'].min()),
+        max_value=float(df['miss_distance'].max()),
+        value=(float(df['miss_distance'].min()), float(df['miss_distance'].max()))
+    )
+    min_miss_distance, max_miss_distance = miss_distance_range
     df_filtered = df[(df['miss_distance'] >= min_miss_distance) & (df['miss_distance'] <= max_miss_distance)]
     
-    # Filtres supplémentaires (exemples : champ autre que "miss_distance" et "time")
-    # Par exemple, si tu as une colonne "category" dans ta table, tu pourrais ajouter un filtre pour cela :
-    if 'category' in df.columns:
-        categories = df['category'].unique()
-        selected_category = st.sidebar.selectbox("Choisir une catégorie", categories)
-        df_filtered = df_filtered[df_filtered['category'] == selected_category]
+    # Filtre par checkbox pour is_hazardous
+    is_hazardous_filter = st.sidebar.checkbox("Is Hazardous", value=False)
+    if is_hazardous_filter:
+        df_filtered = df_filtered[df_filtered['is_hazardous'] == True]
+    
+    # Filtre sur relative_velocity (range slider)
+    velocity_range = st.sidebar.slider(
+        "Vélocité relative (min et max)",
+        min_value=float(df['relative_velocity'].min()),
+        max_value=float(df['relative_velocity'].max()),
+        value=(float(df['relative_velocity'].min()), float(df['relative_velocity'].max()))
+    )
+    min_velocity, max_velocity = velocity_range
+    df_filtered = df_filtered[(df_filtered['relative_velocity'] >= min_velocity) & (df_filtered['relative_velocity'] <= max_velocity)]
+    
+    # Filtre sur magnitude (range slider)
+    magnitude_range = st.sidebar.slider(
+        "Magnitude (min et max)",
+        min_value=float(df['absolute_magnitude'].min()),
+        max_value=float(df['absolute_magnitude'].max()),
+        value=(float(df['absolute_magnitude'].min()), float(df['absolute_magnitude'].max()))
+    )
+    min_magnitude, max_magnitude = magnitude_range
+    df_filtered = df_filtered[(df_filtered['absolute_magnitude'] >= min_magnitude) & (df_filtered['absolute_magnitude'] <= max_magnitude)]
+    
+    # Filtre sur diamètre (range slider)
+    diameter_range = st.sidebar.slider(
+        "Diamètre (min et max)",
+        min_value=float(df['estimated_diameter_min'].min()),
+        max_value=float(df['estimated_diameter_max'].max()),
+        value=(float(df['estimated_diameter_min'].min()), float(df['estimated_diameter_max'].max()))
+    )
+    min_diameter, max_diameter = diameter_range
+    df_filtered = df_filtered[(df_filtered['estimated_diameter_min'] >= min_diameter) & (df_filtered['estimated_diameter_max'] <= max_diameter)]
     
     return df_filtered
 
@@ -74,8 +105,8 @@ def display() :
     st.title("Analyse descriptive des données de la base de données")
     
     # Afficher les premières lignes de la table
-    st.write("**Premières lignes des données :**")
-    st.dataframe(df.head())
+    #st.write("**Premières lignes des données :**")
+    #st.dataframe(df.head())
 
     # Appliquer les filtres
     df_filtered = filter_data(df)

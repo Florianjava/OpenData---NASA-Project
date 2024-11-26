@@ -101,6 +101,7 @@ def display_eonet_map(events):
 # Fonction pour analyser les événements et générer des séries temporelles
 def generate_time_series(events):
     event_data = []
+    
 
     # Itérer sur les événements pour extraire les informations nécessaires
     for event in events:
@@ -131,12 +132,29 @@ def generate_time_series(events):
 # Fonction pour afficher les séries temporelles
 def display_time_series(df_count):
     if df_count is not None:
+        event_colors = {
+            "Wildfires": "red",  # Icône de flamme pour les incendies
+            "Earthquakes":  "brown",  # Icône de séisme
+            "Severe Storms":  "blue",  # Icône de tempête
+            "Drought": "yellow",  # Sécheresse
+            "Dust and Haze": "white",  # Poussière et brume
+            "Floods": "lightblue",  # Inondations
+            "Landslides": "lightbrown",  # Glissement de terrain
+            "Manmade": "gray",  # Événements d'origine humaine
+            "Sea and Lake Ice": "white",  # Glace de mer et de lac
+            "Snow": "white",  # Neige
+            "Temperature Extremes": "orange",  # Températures extrêmes
+            "Volcanoes": "black",  # Volcans
+            "Water Color": "green",  # Couleur de l'eau
+        }
         # Afficher la série temporelle par catégorie
         st.subheader("Nombre d'événements par catégorie au fil du temps")
 
         # Créer une figure plus petite
         fig, ax = plt.subplots(figsize=(18, 10))
-        df_count.plot(ax=ax)
+        colors = [event_colors[col] for col in df_count.columns if col in event_colors]
+
+        df_count.plot(ax=ax, color=colors)
         
         ax.set_title("Nombre d'événements par type au fil du temps")
         ax.set_xlabel("Date")
