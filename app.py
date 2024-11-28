@@ -125,13 +125,15 @@ elif st.session_state.menu == "Earth":
 
 elif st.session_state.menu == "Mars":
 
-    col1, col2, col3 = st.columns([1, 1, 1]) 
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1]) 
     with col1:
         sub_menu_1 = st.button("Mars Homepage")
     with col2:
         sub_menu_2 = st.button("InSight")
     with col3:
         sub_menu_3 = st.button("Rover")
+    with col4 :
+        sub_menu_4 = st.button("Donky")
 
 
 
@@ -141,6 +143,9 @@ elif st.session_state.menu == "Mars":
         st.session_state.sub_menu = "InSight"
     elif sub_menu_3 :
         st.session_state.sub_menu = "Rover"
+    elif sub_menu_4 :
+        st.session_state.sub_menu='Donky'
+    
 
 
 
@@ -157,3 +162,8 @@ elif st.session_state.menu == "Mars":
         st.title("Sous-page Rover")
         from pages.mars_pages.rover import display
         display()  
+
+    elif st.session_state.sub_menu == "Donky" :
+        st.title("Sous-page Donky")
+        from pages.mars_pages.donky import display
+        display()

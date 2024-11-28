@@ -60,7 +60,7 @@ def filter_data(df):
     
     # Filtre sur relative_velocity (range slider)
     velocity_range = st.sidebar.slider(
-        "Vélocité relative (min et max)",
+        "Relativ velocity (min  max)",
         min_value=float(df['relative_velocity'].min()),
         max_value=float(df['relative_velocity'].max()),
         value=(float(df['relative_velocity'].min()), float(df['relative_velocity'].max()))
@@ -70,7 +70,7 @@ def filter_data(df):
     
     # Filtre sur magnitude (range slider)
     magnitude_range = st.sidebar.slider(
-        "Magnitude (min et max)",
+        "Magnitude (min  max)",
         min_value=float(df['absolute_magnitude'].min()),
         max_value=float(df['absolute_magnitude'].max()),
         value=(float(df['absolute_magnitude'].min()), float(df['absolute_magnitude'].max()))
@@ -80,7 +80,7 @@ def filter_data(df):
     
     # Filtre sur diamètre (range slider)
     diameter_range = st.sidebar.slider(
-        "Diamètre (min et max)",
+        "Diametre (min  max)",
         min_value=float(df['estimated_diameter_min'].min()),
         max_value=float(df['estimated_diameter_max'].max()),
         value=(float(df['estimated_diameter_min'].min()), float(df['estimated_diameter_max'].max()))
@@ -142,7 +142,7 @@ def plot_scatter_and_density(df):
     st.pyplot(fig)
 
     # **3. Matrice de corrélation sur un plot séparé**
-    st.write("### Correlation matrix")
+    st.write("### Correlation matrix between caracteristics")
 
     corr_fig, axes = plt.subplots(1, 3, figsize=(20, 4))  # Taille ajustée pour éviter l'écrasement
     corr_matrix = df[["absolute_magnitude", "relative_velocity", "miss_distance", "estimated_diameter_avg"]].corr()

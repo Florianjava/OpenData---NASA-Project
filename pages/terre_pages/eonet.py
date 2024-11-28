@@ -159,17 +159,18 @@ def display_time_series(df_count):
         st.subheader("Number of event per category")
 
         # Créer une figure plus petite
-        fig, ax = plt.subplots(figsize=(18, 10))
+        fig, ax = plt.subplots(figsize=(18, 16))
         colors = [event_colors[col] for col in df_count.columns if col in event_colors]
 
         df_count.plot(ax=ax, color=colors)
         
-        ax.set_title("Number of event in function of the time")
-        ax.set_xlabel("Date")
-        ax.set_ylabel("Number of event")
+        ax.set_xlabel("Date", fontsize=24)
+        ax.set_ylabel("Number of event", fontsize=24)
+        ax.legend(fontsize=24)
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        plt.xticks(rotation=45)
+        plt.xticks(rotation=45, fontsize=20)
+        plt.yticks(fontsize=24)
         plt.tight_layout()
 
         return fig
