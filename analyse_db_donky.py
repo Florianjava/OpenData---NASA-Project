@@ -28,16 +28,20 @@ print(f"Contenu de la table {table_name} :")
 for row in rows:
     print(row)
 
-df = pd.read_sql_query("""SELECT t2.id, COUNT(*) AS cnt 
-FROM coronal_impact AS t1 
-RIGHT JOIN coronal_analyse AS t2 
-ON t1.id = t2.id 
-GROUP BY t2.id;
+df = pd.read_sql_query("""SELECT * FROM coronal_impact 
 """, conn)
 
 
 print(df.head(100))
 
+
+df = pd.read_sql_query("""SELECT * FROM coronal_analyse 
+""", conn)
+
+
+print(df.head(100))
+
+toto()
 
 
 

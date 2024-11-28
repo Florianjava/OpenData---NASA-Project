@@ -1,9 +1,9 @@
 import streamlit as st
-
-
 import sqlite3
 import pandas as pd
-import streamlit as st
+import plotly.express as px
+import plotly.graph_objects as go
+from scipy.stats import gaussian_kde
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -20,7 +20,7 @@ def load_data(db_path, table_name):
     
     return df
 
-# Fonction pour afficher le graphique
+# Fonction pour afficher le graphique avec Plotly
 def plot_miss_distance(df):
     # Convertir la colonne de temps si nécessaire
     if not pd.api.types.is_datetime64_any_dtype(df['close_approach_date']):
@@ -29,15 +29,13 @@ def plot_miss_distance(df):
     # Trier par temps
     df = df.sort_values('close_approach_date')
 
-    # Scatter plot
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.scatter(df['close_approach_date'], df['miss_distance'], alpha=0.7, edgecolors='k')
-    ax.set_title("Miss Distance vs Time")
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Miss Distance")
-    ax.grid(True)
-    plt.xticks(rotation=45)
-    st.pyplot(fig)
+    # Plotly scatter plot
+    fig = px.scatter(df, x='close_approach_date', y='miss_distance', 
+                     title="Miss Distance vs Time",
+                     labels={'close_approach_date': 'Time', 'miss_distance': 'Miss Distance'})
+    fig.update_traces(marker=dict(size=8, opacity=0.7, line=dict(width=1, color='DarkSlateGrey')))
+    fig.update_xaxes(tickangle=45)
+    st.plotly_chart(fig)
 
 # Fonction pour ajouter des filtres interactifs
 def filter_data(df):
@@ -90,8 +88,7 @@ def filter_data(df):
     
     return df_filtered
 
-# Page Streamlit
-
+# Fonction pour afficher les graphiques avec Plotly
 def plot_scatter_and_density(df):
     df['estimated_diameter_avg'] = (df['estimated_diameter_min'] + df['estimated_diameter_max']) / 2
 
@@ -111,8 +108,11 @@ def plot_scatter_and_density(df):
 
     # **1. Scatter plot avec estimation de la densité**
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+    
+    # Convertir en datetime si ce n'est pas déjà fait
     if not pd.api.types.is_datetime64_any_dtype(df['close_approach_date']):
         df['close_approach_date'] = pd.to_datetime(df['close_approach_date'])
+        
     df = df.sort_values('close_approach_date')
 
     # Calcul de la densité avec Gaussian KDE
@@ -153,12 +153,8 @@ def plot_scatter_and_density(df):
     axes[2].axis("off")
     st.pyplot(corr_fig)
 
-
-
-
-
-def display() : 
-
+# Page Streamlit
+def display():
     # Charger les données depuis la base de données
     db_path = 'neo.db'  # Remplacer par le chemin vers ta base de données
     table_name = "neo"  # Remplacer par le nom de ta table
@@ -168,17 +164,11 @@ def display() :
     
     # Afficher un titre
     st.title("Asteroids : Near Earth Objects (date, miss distance and caracteristics)")
-    
-    # Afficher les premières lignes de la table
-    #st.write("**Premières lignes des données :**")
-    #st.dataframe(df.head())
 
     # Appliquer les filtres
     df_filtered = filter_data(df)
 
-    # Afficher le graphique
+    # Afficher les graphiques
     st.write("**Graphique : Miss Distance vs Time**")
     plot_scatter_and_density(df_filtered)
-    #plot_miss_distance(df_filtered)
-
 

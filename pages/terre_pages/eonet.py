@@ -3,8 +3,7 @@ import requests
 import pandas as pd
 import folium
 from folium.plugins import MarkerCluster
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+import plotly.graph_objs as go
 
 # Fonction pour récupérer les événements depuis l'API EONET
 def fetch_eonet_data(limit):
@@ -29,23 +28,6 @@ def display_eonet_map(events):
     marker_cluster = MarkerCluster().add_to(m)
 
     # Définir les icônes pour chaque type d'événement
-    """
-    event_icons = {
-        "Wildfires": "pages/terre_pages/weather_icons/flame.svg",  # Icône de flamme pour les incendies
-        "Earthquakes":  "pages/terre_pages/weather_icons/earthquake.svg",  # Icône de séisme
-        "Severe Storms":  "pages/terre_pages/weather_icons/tornado.svg",  # Icône de tempête
-        "Drought": "",  # Sécheresse
-        "Dust and Haze": "",  # Poussière et brume
-        "Floods": "",  # Inondations
-        "Landslides": "",  # Glissement de terrain
-        "Manmade": "",  # Événements d'origine humaine
-        "Sea and Lake Ice": "",  # Glace de mer et de lac
-        "Snow": "pages/terre_pages/weather_icons/snow.svg",  # Neige
-        "Temperature Extremes": "",  # Températures extrêmes
-        "Volcanoes": "pages/terre_pages/weather_icons/volcano.svg",  # Volcans
-        "Water Color": "pages/terre_pages/weather_icons/water.svg",  # Couleur de l'eau
-    }
-    """
     event_colors = {
         "Wildfires": "red",  # Icône de flamme pour les incendies
         "Earthquakes":  "brown",  # Icône de séisme
@@ -61,6 +43,7 @@ def display_eonet_map(events):
         "Volcanoes": "black",  # Volcans
         "Water Color": "green",  # Couleur de l'eau
     }
+
     # Ajouter chaque événement sur la carte avec une icône spécifique
     for event in events:
         if 'geometries' in event and event['geometries']:
@@ -81,10 +64,8 @@ def display_eonet_map(events):
 
             # Choisir l'icône basée sur le type d'événement
             if event_type:
-                #icon_url = event_icons.get(event_type)
                 color = event_colors.get(event_type)
                 icon = folium.Icon(color=color, icon="info-sign")
-                #icon = folium.CustomIcon(icon_url, icon_size=(40, 40))
             else:
                 icon = folium.Icon(color="blue")  # Icône par défaut si pas de correspondance
 
@@ -102,15 +83,12 @@ def display_eonet_map(events):
     </div>
     """
     
-    # Afficher la carte dans Streamlit
     st.components.v1.html(map_html, height=600, scrolling=False)
-    #st.components.v1.html(m._repr_html_(), width=900, height=600)
 
 # Fonction pour analyser les événements et générer des séries temporelles
 def generate_time_series(events):
     event_data = []
     
-
     # Itérer sur les événements pour extraire les informations nécessaires
     for event in events:
         # Extraire la date de l'événement
@@ -131,13 +109,12 @@ def generate_time_series(events):
     if not df.empty:
         # Compter les événements par type et par date
         df_count = df.groupby([pd.Grouper(key='date', freq='D'), 'category']).size().unstack(fill_value=0)
-
         return df_count
     else:
         st.write("No event to analyze.")
         return None
 
-# Fonction pour afficher les séries temporelles
+# Fonction pour afficher les séries temporelles avec Plotly
 def display_time_series(df_count):
     if df_count is not None:
         event_colors = {
@@ -155,29 +132,35 @@ def display_time_series(df_count):
             "Volcanoes": "black",  # Volcans
             "Water Color": "green",  # Couleur de l'eau
         }
-        # Afficher la série temporelle par catégorie
-        st.subheader("Number of event per category")
 
-        # Créer une figure plus petite
-        fig, ax = plt.subplots(figsize=(18, 16))
-        colors = [event_colors[col] for col in df_count.columns if col in event_colors]
+        # Créer le graphique Plotly
+        data = []
+        for category in df_count.columns:
+            data.append(go.Scatter(
+                x=df_count.index,
+                y=df_count[category],
+                mode='lines',
+                name=category,
+                line=dict(color=event_colors.get(category, 'gray'))
+            ))
 
-        df_count.plot(ax=ax, color=colors)
-        
-        ax.set_xlabel("Date", fontsize=24)
-        ax.set_ylabel("Number of event", fontsize=24)
-        ax.legend(fontsize=24)
-        ax.xaxis.set_major_locator(mdates.MonthLocator())
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        plt.xticks(rotation=45, fontsize=20)
-        plt.yticks(fontsize=24)
-        plt.tight_layout()
+        layout = go.Layout(
+            title="Number of Events per Category Over Time",
+            xaxis=dict(title="Date"),
+            yaxis=dict(title="Number of Events"),
+            hovermode="closest"
+        )
 
-        return fig
+        fig = go.Figure(data=data, layout=layout)
+        st.plotly_chart(fig)
 
 # Fonction qui sera appelée dans la page EONET
 def display():
     st.title("Earth Observatory Natural Events Tracker : EONET")
+
+    st.markdown("""
+    Tracking every last climatic incidents on earth.
+    """)
     
     limit = st.slider('Select a limit of event to fetch', min_value=10, max_value=1000, value=100, step=10)
 
@@ -185,7 +168,7 @@ def display():
     events = fetch_eonet_data(limit=limit)
 
     if events:
-        st.write(f"Number of element found : {len(events)}")
+        st.write(f"Number of element found: {len(events)}")
 
         # Créer deux colonnes pour afficher la carte et le graphique côte à côte
         col1, col2 = st.columns([4, 2])  # Colonne 1 pour la carte (plus large), Colonne 2 pour le graphique
@@ -198,11 +181,8 @@ def display():
             # Générer et afficher les séries temporelles
             df_count = generate_time_series(events)
             if df_count is not None:
-                # Afficher le graphique dans la colonne 2
-                fig = display_time_series(df_count)
-                st.pyplot(fig)
+                # Afficher le graphique Plotly dans la colonne 2
+                display_time_series(df_count)
     else:
         st.write("No event available.")
 
-
-   
