@@ -22,7 +22,7 @@ def display():
     with col2:
         # Inputs pour la date et niveau de zoom
         lat = st.number_input("Latitude", value=1.5, format="%.6f")
-        zoom = st.number_input("Niveau de zoom", value=0.1, min_value=0.0, max_value=1.0)
+        zoom = st.number_input("Zoom level", value=0.1, min_value=0.0, max_value=1.0)
 
     # Bouton Get Image sur la troisième ligne
     if st.button("Get Image"):

@@ -3,172 +3,177 @@ import sqlite3
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from scipy.stats import gaussian_kde
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Fonction pour charger la base de données
 def load_data(db_path, table_name):
-    # Connexion à la base de données
     conn = sqlite3.connect(db_path)
-    
-    # Charger la table dans un DataFrame
     df = pd.read_sql_query(f"SELECT * FROM {table_name};", conn)
-    
-    # Fermer la connexion
     conn.close()
-    
     return df
 
-# Fonction pour afficher le graphique avec Plotly
-def plot_miss_distance(df):
-    # Convertir la colonne de temps si nécessaire
-    if not pd.api.types.is_datetime64_any_dtype(df['close_approach_date']):
-        df['close_approach_date'] = pd.to_datetime(df['close_approach_date'])
-    
-    # Trier par temps
-    df = df.sort_values('close_approach_date')
-
-    # Plotly scatter plot
-    fig = px.scatter(df, x='close_approach_date', y='miss_distance', 
-                     title="Miss Distance vs Time",
-                     labels={'close_approach_date': 'Time', 'miss_distance': 'Miss Distance'})
-    fig.update_traces(marker=dict(size=8, opacity=0.7, line=dict(width=1, color='DarkSlateGrey')))
-    fig.update_xaxes(tickangle=45)
-    st.plotly_chart(fig)
-
-# Fonction pour ajouter des filtres interactifs
+# Fonction pour appliquer des filtres
 def filter_data(df):
-    st.sidebar.title("Filtres de données")
-    
-    # Filtre sur miss_distance (range slider)
+    st.sidebar.title("Filter data")
+
+    # Filtre sur miss_distance
     miss_distance_range = st.sidebar.slider(
-        "Distance (min et max)",
+        "Distance (min and max)",
         min_value=float(df['miss_distance'].min()),
         max_value=float(df['miss_distance'].max()),
         value=(float(df['miss_distance'].min()), float(df['miss_distance'].max()))
     )
-    min_miss_distance, max_miss_distance = miss_distance_range
-    df_filtered = df[(df['miss_distance'] >= min_miss_distance) & (df['miss_distance'] <= max_miss_distance)]
-    
-    # Filtre par checkbox pour is_hazardous
-    is_hazardous_filter = st.sidebar.checkbox("Is Hazardous", value=False)
-    if is_hazardous_filter:
-        df_filtered = df_filtered[df_filtered['is_hazardous'] == True]
-    
-    # Filtre sur relative_velocity (range slider)
+    df = df[(df['miss_distance'] >= miss_distance_range[0]) & 
+            (df['miss_distance'] <= miss_distance_range[1])]
+
+    # Filtre sur relative_velocity
     velocity_range = st.sidebar.slider(
-        "Relativ velocity (min  max)",
+        "Relative Velocity (min and max)",
         min_value=float(df['relative_velocity'].min()),
         max_value=float(df['relative_velocity'].max()),
         value=(float(df['relative_velocity'].min()), float(df['relative_velocity'].max()))
     )
-    min_velocity, max_velocity = velocity_range
-    df_filtered = df_filtered[(df_filtered['relative_velocity'] >= min_velocity) & (df_filtered['relative_velocity'] <= max_velocity)]
-    
-    # Filtre sur magnitude (range slider)
+    df = df[(df['relative_velocity'] >= velocity_range[0]) & 
+            (df['relative_velocity'] <= velocity_range[1])]
+
+    # Filtre sur absolute_magnitude
     magnitude_range = st.sidebar.slider(
-        "Magnitude (min  max)",
+        "Absolute Magnitude (min and max)",
         min_value=float(df['absolute_magnitude'].min()),
         max_value=float(df['absolute_magnitude'].max()),
         value=(float(df['absolute_magnitude'].min()), float(df['absolute_magnitude'].max()))
     )
-    min_magnitude, max_magnitude = magnitude_range
-    df_filtered = df_filtered[(df_filtered['absolute_magnitude'] >= min_magnitude) & (df_filtered['absolute_magnitude'] <= max_magnitude)]
+    df = df[(df['absolute_magnitude'] >= magnitude_range[0]) & 
+            (df['absolute_magnitude'] <= magnitude_range[1])]
     
-    # Filtre sur diamètre (range slider)
-    diameter_range = st.sidebar.slider(
-        "Diametre (min  max)",
-        min_value=float(df['estimated_diameter_min'].min()),
-        max_value=float(df['estimated_diameter_max'].max()),
-        value=(float(df['estimated_diameter_min'].min()), float(df['estimated_diameter_max'].max()))
-    )
-    min_diameter, max_diameter = diameter_range
-    df_filtered = df_filtered[(df_filtered['estimated_diameter_min'] >= min_diameter) & (df_filtered['estimated_diameter_max'] <= max_diameter)]
-    
-    return df_filtered
+    return df
 
-# Fonction pour afficher les graphiques avec Plotly
-def plot_scatter_and_density(df):
-    df['estimated_diameter_avg'] = (df['estimated_diameter_min'] + df['estimated_diameter_max']) / 2
-
-    # Mapping pour renommer les variables
-    axis_labels = {
-        "absolute_magnitude": "Absolute Magnitude",
-        "relative_velocity": "Relative Velocity",
-        "miss_distance": "Miss Distance",
-        "estimated_diameter_avg": "Estimated Diameter (Avg)"
-    }
-
-    # Sélection de la variable pour le graphique de densité
-    variable = st.selectbox(
-        "Select a variable for the density plot :",
-        ["absolute_magnitude", "relative_velocity", "miss_distance", "estimated_diameter_avg"]
-    )
-
-    # **1. Scatter plot avec estimation de la densité**
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-    
-    # Convertir en datetime si ce n'est pas déjà fait
+# Scatter plot avec Plotly
+def plot_scatter(df):
     if not pd.api.types.is_datetime64_any_dtype(df['close_approach_date']):
         df['close_approach_date'] = pd.to_datetime(df['close_approach_date'])
-        
     df = df.sort_values('close_approach_date')
 
-    # Calcul de la densité avec Gaussian KDE
-    from scipy.stats import gaussian_kde
-    x = df['close_approach_date'].map(lambda x: x.timestamp())  # Convertir en timestamps
-    y = df['miss_distance']
-    kde = gaussian_kde([x, y])
-    density = kde([x, y])
-
-    scatter = axes[0].scatter(
-        df['close_approach_date'], df['miss_distance'], c=density, cmap='viridis', alpha=0.7, edgecolors='k'
+    fig = px.scatter(
+        df,
+        x='close_approach_date',
+        y='miss_distance',
+        title="Miss Distance vs Time",
+        labels={'close_approach_date': 'Date', 'miss_distance': 'Miss Distance'},
+        color='relative_velocity',
+        color_continuous_scale='Viridis'
     )
-    axes[0].set_title("Miss Distance vs Time (avec densité)")
-    axes[0].set_xlabel("Time")
-    axes[0].set_ylabel(axis_labels["miss_distance"])
-    axes[0].grid(True)
-    axes[0].tick_params(axis='x', rotation=45)
-    fig.colorbar(scatter, ax=axes[0], label="Densité")
+    fig.update_traces(marker=dict(size=6, opacity=0.8))
+    return fig
 
-    # **2. Graphique de densité**
-    sns.kdeplot(df[variable], ax=axes[1], fill=True, color="skyblue")
-    axes[1].set_title(f"Density of {axis_labels[variable]}")
-    axes[1].set_xlabel(axis_labels[variable])
-    axes[1].set_ylabel("Density")
+def plot_relation(df, x_var, y_var, color_var=None):
+    if color_var:
+        fig = px.scatter(
+            df,
+            x=x_var,
+            y=y_var,
+            title=f"Relationship between {x_var.replace('_', ' ').title()} and {y_var.replace('_', ' ').title()}",
+            labels={x_var: x_var.replace('_', ' ').title(), y_var: y_var.replace('_', ' ').title()},
+            color=color_var,
+            color_continuous_scale='Viridis'
+        )
+    else:
+        fig = px.scatter(
+            df,
+            x=x_var,
+            y=y_var,
+            title=f"Relationship between {x_var.replace('_', ' ').title()} and {y_var.replace('_', ' ').title()}",
+            labels={x_var: x_var.replace('_', ' ').title(), y_var: y_var.replace('_', ' ').title()},
+        )
+    fig.update_traces(marker=dict(size=6, opacity=0.8))
+    return fig
 
-    plt.tight_layout()
-    st.pyplot(fig)
+# Graphique de densité avec Plotly
+def plot_density(df, variable):
+    fig = go.Figure()
 
-    # **3. Matrice de corrélation sur un plot séparé**
-    st.write("### Correlation matrix between caracteristics")
+    fig.add_trace(
+        go.Histogram(
+            x=df[variable],
+            histnorm='probability density',
+            name='Density',
+            marker=dict(color='skyblue'),
+            opacity=0.75
+        )
+    )
 
-    corr_fig, axes = plt.subplots(1, 3, figsize=(20, 4))  # Taille ajustée pour éviter l'écrasement
-    corr_matrix = df[["absolute_magnitude", "relative_velocity", "miss_distance", "estimated_diameter_avg"]].corr()
-    renamed_corr = corr_matrix.rename(columns=axis_labels, index=axis_labels)  # Modifier les noms
-    sns.heatmap(renamed_corr, annot=True, cmap="coolwarm", ax=axes[1], cbar_kws={'shrink': 0.8}, fmt=".2f")
-    axes[1].set_title("Correlation matrix")
-    axes[0].axis("off")
-    axes[2].axis("off")
-    st.pyplot(corr_fig)
+    fig.update_layout(
+        title=f"Density Plot of {variable.replace('_', ' ').title()}",
+        xaxis_title=variable.replace('_', ' ').title(),
+        yaxis_title='Density',
+        bargap=0.2
+    )
+    return fig
 
-# Page Streamlit
+# Page principale
 def display():
-    # Charger les données depuis la base de données
-    db_path = 'neo.db'  # Remplacer par le chemin vers ta base de données
-    table_name = "neo"  # Remplacer par le nom de ta table
-    
+    db_path = 'neo.db'
+    table_name = 'neo'
+
     # Charger les données
     df = load_data(db_path, table_name)
-    
-    # Afficher un titre
-    st.title("Asteroids : Near Earth Objects (date, miss distance and caracteristics)")
+
+    # Afficher le titre
+    st.title("Asteroids : Near Earth Objects Analysis")
+    st.write("Here is a small dashboard for listing objects flying near earth and analyzing their caracteristics.")
+    st.write("")
+    st.write("")
 
     # Appliquer les filtres
     df_filtered = filter_data(df)
 
-    # Afficher les graphiques
-    st.write("**Graphique : Miss Distance vs Time**")
-    plot_scatter_and_density(df_filtered)
+    col1a, col2a = st.columns([1, 1])
+    with col1a :
+        st.metric("Current number of objects selected : ", len(df_filtered))
+    with col2a :
+        variable = st.selectbox(
+            "Select a variable for the density plot",
+            ["miss_distance", "relative_velocity", "absolute_magnitude"]
+        )
 
+    # Scatter plot
+    scatter_fig = plot_scatter(df_filtered)
+
+    # Densité
+    
+    density_fig = plot_density(df_filtered, variable)
+
+    # Afficher les deux graphiques côte à côte
+    st.subheader("Visualizations")
+    st.write("")
+
+    col1b, col2b = st.columns(2)
+    with col1b:
+        st.plotly_chart(scatter_fig, use_container_width=True)
+    with col2b:
+        st.plotly_chart(density_fig, use_container_width=True)
+
+
+    st.subheader("Analysis of correlation between two variables")
+    col1c, col2c = st.columns([1, 3]) 
+
+    
+    with col1c :
+
+        x_var = st.selectbox(
+            "Select the variable for the X axis",
+            df_filtered.columns.tolist()
+        )
+        y_var = st.selectbox(
+            "Select the variable for the Y axis",
+            df_filtered.columns.tolist()
+        )
+
+        # Sélectionner la variable pour colorier les points
+        color_var = st.selectbox(
+            "Select a variable to color the points",
+            ["relative_velocity", "miss_distance", "absolute_magnitude"] + df_filtered.columns.tolist()
+        )
+    with col2c :
+        # Générer et afficher le graphique de la relation
+        relation_fig = plot_relation(df_filtered, x_var, y_var, color_var)
+        st.plotly_chart(relation_fig, use_container_width=True)

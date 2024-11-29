@@ -1,5 +1,6 @@
 import streamlit as st
 import requests 
+import random
 
 st.set_page_config(page_title="Planetary Exploration", layout="wide")
 
@@ -102,11 +103,10 @@ elif st.session_state.menu == "Earth":
 
 
 
-    if st.session_state.sub_menu == "Earth Homepage" :
-    
-        st.title("Earth homepage")
-        st.write("Bienvenue sur la page d'accueil de Terre !")
-    
+    if st.session_state.sub_menu == "Earth Homepage":
+        from pages.terre_pages.home import display 
+        display()
+        
     elif st.session_state.sub_menu == "Earth photo" :
         from pages.terre_pages.earth import display
         display()  
@@ -150,8 +150,8 @@ elif st.session_state.menu == "Mars":
 
 
     if st.session_state.sub_menu == "Mars Homepage" :
-        st.title("Mars homepage")
-        st.write("Bienvenue sur la page d'accueil de Mars !")
+        from pages.mars_pages.home import display
+        display()
     
     elif st.session_state.sub_menu == "InSight" :
         st.title("Sous-page InSight")
@@ -164,6 +164,5 @@ elif st.session_state.menu == "Mars":
         display()  
 
     elif st.session_state.sub_menu == "Donky" :
-        st.title("Sous-page Donky")
         from pages.mars_pages.donky import display
         display()

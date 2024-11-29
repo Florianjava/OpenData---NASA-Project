@@ -37,7 +37,7 @@ def display():
     df = load_data(db_path, table_name)
     df["eventTime"] = pd.to_datetime(df["eventTime"])  # Convertir eventTime en datetime
 
-    st.title("Analyse des événements climatiques")
+    st.title("Donky API web page : analyze space climatic data")
 
     # Créer deux colonnes : une plus large pour le graphique, une plus petite pour les boutons
     col1, col2 = st.columns([3, 1])
@@ -46,23 +46,24 @@ def display():
     if "current_visu" not in st.session_state:
         st.session_state["current_visu"] = '1'
     #st.session_state.current_visu = '1'
-    plot_area = col1.empty()
+    #plot_area = col1.empty()
 
     # Visualisation des événements climatiques
     def plot_events(selected_kinds):
-        selected_kinds = st.multiselect(
-            "Sélectionnez les types d'événements :", 
-            kinds, 
-            default=st.session_state.selected_kinds
-        )
+        with col1 :
+            selected_kinds = st.multiselect(
+                "Select events kind :", 
+                kinds, 
+                default=st.session_state.selected_kinds
+            )
         
         # Mettre à jour st.session_state lorsque la sélection change
         if not array_equal(selected_kinds, st.session_state.selected_kinds):
             st.session_state.selected_kinds = selected_kinds
             #st.experimental_rerun()  # Rafraîchir la page
 
-        plot_area.empty()  # Vider l'espace actuel
-        st.write("**Tendance quotidienne : Nombre d'événements par jour pour chaque type sélectionné**")
+        col1.empty()  # Vider l'espace actuel
+        st.write("**Overview of global trend : number of event per category**")
         
         # Filtrer les données
         filtered_df = df[df["kind"].isin(selected_kinds)]
@@ -83,22 +84,21 @@ def display():
                 ))
 
         fig.update_layout(
-            title="Tendance quotidienne par type d'événement",
+            title="Daily report of event",
             xaxis_title="Jour",
-            yaxis_title="Nombre d'événements",
+            yaxis_title="Number of event",
             xaxis_tickangle=45,
-            legend_title="Types d'événements",
+            legend_title="Kinds of event",
             template="plotly_dark",
             autosize=True, 
             width=600,
             height=600
         )
-        
-        plot_area.plotly_chart(fig, use_container_width=True, key="unique_id1")
+        col1.plotly_chart(fig, use_container_width=True, key="unique_id1")
 
     # Scatter plot des flares
     def plot_flares():
-        plot_area.empty()  # Vider l'espace actuel
+        col1.empty()  # Vider l'espace actuel
         table_name_flare = "flare"
         flare_df = load_data(db_path, table_name_flare)
         flare_df["sourceLocation"] = flare_df["sourceLocation"].astype(str)
@@ -138,7 +138,7 @@ def display():
 
         # Forcer l'échelle égale entre les axes X et Y
         fig.update_layout(
-            title="Scatter plot des flares",
+            title="Flares' scatter plot",
             xaxis_title="Longitude",
             yaxis_title="Latitude",
             template="plotly_dark",
@@ -151,11 +151,11 @@ def display():
             height=600
         )
 
-        plot_area.plotly_chart(fig, use_container_width=True)
+        col1.plotly_chart(fig, use_container_width=True)
 
 
     def plot_geomagnetic():
-        plot_area.empty()  # Vider l'espace actuel
+        col1.empty()  # Vider l'espace actuel
         table_name_geomagnetic = "geomagnetic"
         geomagnetic_df = load_data(db_path, table_name_geomagnetic)
         geomagnetic_df["date"] = pd.to_datetime(geomagnetic_df["observedTime"])  # Convertir la date en datetime
@@ -181,7 +181,7 @@ def display():
             ))
 
         fig.update_layout(
-            title="Indice Kp en fonction du temps",
+            title="Kp Index in function of time",
             xaxis_title="Date",
             yaxis_title="Kp Index",
             template="plotly_dark",
@@ -192,11 +192,16 @@ def display():
             height=600  # Hauteur du graphique
         )
 
-        plot_area.plotly_chart(fig, use_container_width=True)
+        col1.plotly_chart(fig, use_container_width=True)
 
 
     def plot_coronal_analysis():
-        plot_area.empty()  # Vider l'espace actuel
+        col1.empty()  # Vider l'espace actuel
+        with col1 :
+            variable = st.selectbox(
+                "Choose a variable to colorize the points :", 
+                ["halfAngle", "speed", "arrivalTime", "type"]
+            )
 
         # Charger les données des tables coronal_impact et coronal_analyse
         table_impact = "coronal_impact"
@@ -211,10 +216,7 @@ def display():
         merged_df["arrivalTime"] = pd.to_datetime(merged_df["arrivalTime"], errors="coerce")
 
         # Sélecteur pour la variable à colorier
-        variable = st.selectbox(
-            "Choisissez la variable pour colorier les points :", 
-            ["halfAngle", "speed", "arrivalTime", "type"]
-        )
+        
 
         # Gestion de la coloration
         if variable == "arrivalTime":
@@ -237,7 +239,7 @@ def display():
             color=color_var,
             color_continuous_scale=color_scale if variable != "type" else None,
             color_discrete_sequence=color_scale if variable == "type" else None,
-            title="Analyse coronal : Distribution par latitude/longitude",
+            title="Coronal analysis : Distribution per latitude/longitude",
             labels={"longitude": "Longitude", "latitude": "Latitude", variable: variable},
             hover_data=["halfAngle", "speed", "arrivalTime", "type"]
         )
@@ -250,7 +252,7 @@ def display():
             coloraxis_colorbar=dict(title=variable if variable != "type" else "Type")
         )
 
-        plot_area.plotly_chart(fig, use_container_width=True)
+        col1.plotly_chart(fig, use_container_width=True)
 
 
 
@@ -268,7 +270,7 @@ def display():
 
     # Boutons pour changer de visualisation
     with col2:
-        st.subheader("Autres visualisations")
+        st.subheader("Other visualisations")
         
         # Bouton pour réafficher la première visualisation
         if st.button("Daily report of event"):
@@ -284,6 +286,18 @@ def display():
 
         if st.button("Coronal Impact") :
             st.session_state["current_visu"] = '4'
+
+
+        if st.session_state["current_visu"] == '1':
+            st.write("**Explanation : different kinds of events occur in space including Interplanetary Shocks, Solar Energetic Particle, Radiation Belt Enhancement etc. This visualisation provides an overview of their frequency.**")
+        elif st.session_state["current_visu"] == '2':
+            st.write("**Explanation : Flare stands for Solar Flare, a relatively intense, localized emission of electromagnetic radiation in the Sun's atmosphere. It might be accompanied by coronal mass ejections and we report them by lat/long of the Sun.**")
+        elif st.session_state["current_visu"] == "3":
+            st.write("**Explanation : A Geomagnetic Storm, also known as a magnetic storm, is a temporary disturbance of the Earth's magnetosphere caused by a solar wind shock wave. The K-index quantifies disturbances in the horizontal component of Earth's magnetic field with an integer in the range 0–9 with 1 being calm and 5 or more indicating a geomagnetic storm.**")
+        elif st.session_state["current_visu"] == "4":
+            st.write("**Explanation : A coronal mass ejection (CME) is a significant ejection of plasma mass from the Sun's corona into the heliosphere. CMEs are often associated with solar flares and other forms of solar activity.**")
+
+        
 
     if st.session_state["current_visu"] == '1' :
         plot_events(st.session_state.selected_kinds)
