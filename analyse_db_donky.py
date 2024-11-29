@@ -28,12 +28,12 @@ print(f"Contenu de la table {table_name} :")
 for row in rows:
     print(row)
 
-df = pd.read_sql_query("""SELECT * FROM coronal_impact 
+df = pd.read_sql_query("""SELECT * FROM geomagnetic 
 """, conn)
 
 
 print(df.head(100))
-
+#toto()
 
 df = pd.read_sql_query("""SELECT * FROM coronal_analyse 
 """, conn)

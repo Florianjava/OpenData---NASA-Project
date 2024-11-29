@@ -37,7 +37,7 @@ def display():
     df = load_data(db_path, table_name)
     df["eventTime"] = pd.to_datetime(df["eventTime"])  # Convertir eventTime en datetime
 
-    st.title("Donky API web page : analyze space climatic data")
+    st.title("Donki API web page : analyze space climatic data")
 
     # Créer deux colonnes : une plus large pour le graphique, une plus petite pour les boutons
     col1, col2 = st.columns([3, 1])
@@ -56,6 +56,7 @@ def display():
                 kinds, 
                 default=st.session_state.selected_kinds
             )
+            st.write("**Overview of global trend : number of event per category**")
         
         # Mettre à jour st.session_state lorsque la sélection change
         if not array_equal(selected_kinds, st.session_state.selected_kinds):
@@ -63,7 +64,7 @@ def display():
             #st.experimental_rerun()  # Rafraîchir la page
 
         col1.empty()  # Vider l'espace actuel
-        st.write("**Overview of global trend : number of event per category**")
+        
         
         # Filtrer les données
         filtered_df = df[df["kind"].isin(selected_kinds)]
@@ -99,6 +100,8 @@ def display():
     # Scatter plot des flares
     def plot_flares():
         col1.empty()  # Vider l'espace actuel
+        with col1 :
+            st.write("Flares events with respect to their coordinates.")
         table_name_flare = "flare"
         flare_df = load_data(db_path, table_name_flare)
         flare_df["sourceLocation"] = flare_df["sourceLocation"].astype(str)
@@ -156,6 +159,8 @@ def display():
 
     def plot_geomagnetic():
         col1.empty()  # Vider l'espace actuel
+        with col1 :
+            st.write("Geomagnetic Storms events shown by date and their respectiv KpIndex.")
         table_name_geomagnetic = "geomagnetic"
         geomagnetic_df = load_data(db_path, table_name_geomagnetic)
         geomagnetic_df["date"] = pd.to_datetime(geomagnetic_df["observedTime"])  # Convertir la date en datetime
@@ -270,7 +275,7 @@ def display():
 
     # Boutons pour changer de visualisation
     with col2:
-        st.subheader("Other visualisations")
+        st.subheader("Other visualizations")
         
         # Bouton pour réafficher la première visualisation
         if st.button("Daily report of event"):
@@ -289,7 +294,7 @@ def display():
 
 
         if st.session_state["current_visu"] == '1':
-            st.write("**Explanation : different kinds of events occur in space including Interplanetary Shocks, Solar Energetic Particle, Radiation Belt Enhancement etc. This visualisation provides an overview of their frequency.**")
+            st.write("**Explanation : different kinds of events occur in space including Interplanetary Shocks, Solar Energetic Particle, Radiation Belt Enhancement etc. This visualization provides an overview of their frequency.**")
         elif st.session_state["current_visu"] == '2':
             st.write("**Explanation : Flare stands for Solar Flare, a relatively intense, localized emission of electromagnetic radiation in the Sun's atmosphere. It might be accompanied by coronal mass ejections and we report them by lat/long of the Sun.**")
         elif st.session_state["current_visu"] == "3":

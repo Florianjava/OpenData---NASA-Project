@@ -46,7 +46,7 @@ if st.session_state.menu == "Home":
                 <li><strong>Near Earth Object Web Service (NEOWS)</strong>: Track near-Earth objects, including asteroids and comets, with data on their size, orbit, and impact risks.</li>
                 <li><strong>Mars Rover Photos</strong>: Access images captured by Mars rovers like Curiosity and Perseverance, filtered by date and location.</li>
                 <li><strong>InSight</strong>: Explore data from NASA's InSight lander, studying Mars' seismic activity and atmospheric conditions.</li>
-                <li><strong>Exoplanet Archive</strong>: Discover confirmed exoplanets and their characteristics, enhancing our understanding of planetary systems beyond our own.</li>
+                <li><strong>Donki</strong>: Space Weather Database Of Notifications, Knowledge, Informations provides data on recent events int the galaxy.</li>
             </ul>
             These APIs empower users to explore and engage with the wonders of space and planetary science.<br>
             For more details, visit the <a href="https://api.nasa.gov/" style="color: white;">NASA APIs Documentation</a>.
@@ -133,7 +133,7 @@ elif st.session_state.menu == "Mars":
     with col3:
         sub_menu_3 = st.button("Rover")
     with col4 :
-        sub_menu_4 = st.button("Donky")
+        sub_menu_4 = st.button("Donki")
 
 
 
@@ -144,7 +144,7 @@ elif st.session_state.menu == "Mars":
     elif sub_menu_3 :
         st.session_state.sub_menu = "Rover"
     elif sub_menu_4 :
-        st.session_state.sub_menu='Donky'
+        st.session_state.sub_menu='Donki'
     
 
 
@@ -163,6 +163,6 @@ elif st.session_state.menu == "Mars":
         from pages.mars_pages.rover import display
         display()  
 
-    elif st.session_state.sub_menu == "Donky" :
-        from pages.mars_pages.donky import display
+    elif st.session_state.sub_menu == "Donki" :
+        from pages.mars_pages.donki import display
         display()

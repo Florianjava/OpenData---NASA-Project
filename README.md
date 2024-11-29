@@ -1,5 +1,9 @@
 # OpenData---NASA-Project
 
+## Description du projet 
+
+Ce projet vise à fournir un dashboard interactif en requêtant les API mises à disposition par la NASA. Pour certaines nous avons requêté au préalable les données que nous avons stockées dans une base de données python SQL. Le dashboard consiste en deux onglets principaux "Earth" et "Mars" qui contiennent des API relatives à chacune.   
+
 ## Les API utilisées :
 
 - APOD : "Astronomical Picture Of the Day" fournit une image de la voie lactée. (requêtée en direct)
@@ -8,14 +12,9 @@
 - Earth : fournit une image satellite de Landsat 8 selon des coordonnées spécifiées (requêtée en direct)
 - EONET : "Earth Observatory Natural Event Tracker" recense les évènements naturels sur terre comme les incendies, tempêtes, ... (requêtée en direct) 
 - EPIC : "Earth Polychromatic Imaging Camera" fournit une observation de la terre. (requêtée en direct)
-- Exoplanet 
-- Open Science Data Repository
 - InSight : fournit les données climatique sur Mars. (requêtée en direct)
 - Mars Rover Photos : fournit les images récupérées par les rovers sur Mars (requêtée en direct)
-- NASA Image and Video Library 
-- TechTransfer : recense les nouveautés technologiques et des images associées. (requêtée en direct)
-- Satellite Situation Center
-- SSD/CNEOS : collection de petites API sur la dynamique du système solaire et objets proches de la terre. (requêtée en direct)
+
 
 
 
