@@ -154,9 +154,9 @@ elif st.session_state.menu == "Mars":
         display()
     
     elif st.session_state.sub_menu == "InSight" :
-        st.title("Sous-page InSight")
-        from pages.mars_pages.insight import display
-        display()  
+        st.title("Mars Weather Datas")
+        from pages.mars_pages.insight import plot_filtered_data
+        plot_filtered_data()  
         
     elif st.session_state.sub_menu == "Rover":  
         st.title("Sous-page Rover")

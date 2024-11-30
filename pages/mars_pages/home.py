@@ -12,13 +12,17 @@ def display() :
     with col1: 
         # Texte avec une taille différente pour les 2 premières phrases et liste HTML
         st.markdown("""
-            <h2>Welcome to the Mars Home Page.</h2>  
-            <h3>Here you can use the three following APIs from the NASA website:</h3>
-            <ul>
-                <li><strong>InSight API</strong>: Provides climatic data on Mars.</li>
-                <li><strong>Rover</strong>: Give access to Mars Rover's photos.</li>
-                <li><strong>Donky</strong>: Describe some of the space climatic incident.</li>
-            </ul>
+        <h2>Explore Mars and Space Weather Data!</h2>
+
+        <p>In the <strong>Mars</strong> section, you can:</p>
+        <ul>
+            <li><strong>View Stunning Photos</strong>: Discover images captured by Mars rovers through NASA’s Mars Rover API.</li>
+            <li><strong>Check Martian Weather</strong>: Access weather data from the InSight lander, providing insights into Mars’ atmospheric conditions.</li>
+            <li><strong>Explore Space Weather</strong>: Stay updated with space weather events using the DONKI API, offering real-time information on solar activities and their potential impact.</li>
+        </ul>
+
+        <p>Dive in and explore the Red Planet and beyond! 🌌🔭</p>
+
         """, unsafe_allow_html=True)
     with col2 :
         st.image("pages/mars_pages/mars.jpg", use_column_width=True)
