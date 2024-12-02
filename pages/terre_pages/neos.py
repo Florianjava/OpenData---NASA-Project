@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import plotly.express as px
+import numpy as np
 import plotly.graph_objects as go
 
 # Fonction pour charger la base de données
@@ -128,7 +129,14 @@ def display():
 
     col1a, col2a = st.columns([1, 1])
     with col1a :
-        st.metric("Current number of objects selected : ", len(df_filtered))
+        sub_col1, sub_col2, sub_col3 = st.columns([1, 1, 1])
+        with sub_col1 :
+            st.metric("Current number of objects selected : ", len(df_filtered))
+        with sub_col2 :
+            st.metric("Average Relative Velocity :", round(np.mean(df_filtered["relative_velocity"].to_list()), 2))
+        with sub_col3 :
+            st.metric("Average Miss Distance :", round(np.mean(df_filtered["miss_distance"].to_list()), 2))
+        
     with col2a :
         variable = st.selectbox(
             "Select a variable for the density plot",
@@ -161,11 +169,13 @@ def display():
 
         x_var = st.selectbox(
             "Select the variable for the X axis",
-            df_filtered.columns.tolist()
+            df_filtered.columns.tolist(),
+            index=df_filtered.columns.tolist().index('miss_distance')
         )
         y_var = st.selectbox(
             "Select the variable for the Y axis",
-            df_filtered.columns.tolist()
+            df_filtered.columns.tolist(),
+            index=df_filtered.columns.tolist().index('absolute_magnitude')
         )
 
         # Sélectionner la variable pour colorier les points

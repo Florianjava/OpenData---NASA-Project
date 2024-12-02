@@ -17,7 +17,7 @@ def display() :
         <p>In the <strong>Mars</strong> section, you can:</p>
         <ul>
             <li><strong>View Stunning Photos</strong>: Discover images captured by Mars rovers through NASA’s Mars Rover API.</li>
-            <li><strong>Check Martian Weather</strong>: Access weather data from the InSight lander, providing insights into Mars’ atmospheric conditions.</li>
+            <li><strong>Check Martian Weather</strong>: Access weather data from the InSight lander, providing insights into Mars’ atmospheric conditions.( acces to data: https://www.kaggle.com/datasets/imkrkannan/mars-weather-data) </li>
             <li><strong>Explore Space Weather</strong>: Stay updated with space weather events using the DONKI API, offering real-time information on solar activities and their potential impact.</li>
         </ul>
 
