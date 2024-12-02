@@ -41,7 +41,6 @@ df = pd.read_sql_query("""SELECT * FROM coronal_analyse
 
 print(df.head(100))
 
-toto()
 
 
 

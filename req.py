@@ -1,10 +1,11 @@
+# %%
 import requests
 import sqlite3
 from datetime import datetime, timedelta
 
 
-
-
+# %%
+# fonction pour récupérer les éléments dans la requête api
 def fetch_data_neo(json) :
     weakly_count = json["element_count"]
 
@@ -34,6 +35,8 @@ def fetch_data_neo(json) :
 
     return weakly_count, ids, abs_magn, est_diam_max, est_diam_min, hazardous, close_approch_date, rel_veloc, miss_dist, orb_body
 
+# %%
+# fonction pour requêter l'api NeoWs
 def read_neo() :
 
     cursor.execute("""
@@ -63,7 +66,7 @@ def read_neo() :
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json() 
-            weakly_count, ids, abs_magn, est_diam_max, est_diam_min, hazardous, close_approch_date, rel_veloc, miss_dist, orb_body = fetch_data(data)
+            weakly_count, ids, abs_magn, est_diam_max, est_diam_min, hazardous, close_approch_date, rel_veloc, miss_dist, orb_body = fetch_data_neo(data)
             total_count += weakly_count
             for i in range(weakly_count) :        
                 cursor.execute("""INSERT INTO data (id, absolute_magnitude, estimated_diameter_min, estimated_diameter_max, is_hazardous,
@@ -75,7 +78,9 @@ def read_neo() :
             print(f"Erreur lors de la requête pour la période du {current_date} au {next_date}: {response.status_code}")
         current_date = next_date +timedelta(days=1)
 
+# %%
 
+# SELECTION DE L'URL de requêtage
 url = "https://api.nasa.gov/DONKI/CME?startDate=2024-03-01&endDate=2024-03-30&api_key=kmprgzbT3jYlUGYa2BeDfRWMjrEnUu4RcWrelMfJ"   # beaucoup de data pas hyper intéressantes
 #url = "https://api.nasa.gov/DONKI/CMEAnalysis?startDate=2016-09-01&endDate=2016-09-30&mostAccurateOnly=true&speed=500&halfAngle=30&catalog=ALL&api_key=kmprgzbT3jYlUGYa2BeDfRWMjrEnUu4RcWrelMfJ"   # version du dessus filtrée?
 # [{'activityID', 'startTime', 'cmeAnalyses'=[{'isMostAccurate', 'latitude', 'longitude', 'halfAngle', 'speed', 'type' }], 'linkedEvents'}]
@@ -98,8 +103,9 @@ url = "https://api.nasa.gov/DONKI/CME?startDate=2024-03-01&endDate=2024-03-30&ap
 
 # LINKED EVENT MIGHT BE NONE
     
+# %%
 
-
+# connexion pour base donki
 response = requests.get(url)
 if response.status_code == 200:
     data = response.json()             
@@ -171,6 +177,8 @@ cursor.execute("""
         )
 """)
 
+
+# %%
 
 def fetch_data_donky(data, kind):
     if kind == 'GST' :
@@ -261,7 +269,7 @@ def fetch_data_donky(data, kind):
         return climate_rows, linked_rows, None, None
     
 
-
+# %%
 
 names = {'CME' : 'Coronal mass ejection', 'GST' : 'Geomagnetic storm', 'IPS':'Interplanetary shock', 'FLR' : 'Solar Flare', 'SEP' : 'Solar energetic particle',
           'MPC':'Magnetopause crossing', 'RBE': 'Radiation Belt Enhancement', 'HSS': 'Hight speed stream'}
