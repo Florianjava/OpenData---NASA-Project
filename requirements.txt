@@ -6,4 +6,3 @@ plotly
 aiohttp
 Pillow
 numpy
-sqlite3
