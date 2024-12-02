@@ -38,7 +38,7 @@ if st.session_state.menu == "Home":
 
     with left_column:
         st.markdown(f"""
-        <div style='font-size: 15px; color: white;'>
+        <div style='font-size: 15px;'>
             <strong><u>NASA API Overview</u></strong><br>
             NASA offers a range of APIs that provide access to exciting astronomical data. Key APIs include:<br>
             <ul>
@@ -63,11 +63,11 @@ if st.session_state.menu == "Home":
             apod_date = apod_data.get("date")
 
             st.markdown(f"""
-            <div style='font-size: 15px; color: white;'>
+            <div style='font-size: 15px;'>
                 <strong><u>Pic of the day</u></strong><br>
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(f"<div style='text-align: center;font-size: 25px;font-weight: bold; color: white;'>{apod_title} ({apod_date})</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='text-align: center;font-size: 25px;font-weight: bold;'>{apod_title} ({apod_date})</div>", unsafe_allow_html=True)
             st.markdown(f"<div style='text-align: center;'><img src='{apod_img_url}' style='max-width: 100%; width: 500px;'></div>", unsafe_allow_html=True)
             # st.markdown(f"<div style='font-size: 12px; color: white;'>{apod_explanation}</div>", unsafe_allow_html=True)
 

@@ -1,0 +1,9 @@
+streamlit
+requests
+pandas
+folium
+plotly
+aiohttp
+Pillow
+numpy
+sqlite3
