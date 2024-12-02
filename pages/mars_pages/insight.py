@@ -1,15 +1,14 @@
 import streamlit as st
 import pandas as pd
-import os
 import plotly.express as px
-
 
 # Function to filter and plot data
 def plot_filtered_data():
     df = pd.read_csv("mars_weather.csv")
     df["pressure"] = pd.to_numeric(df["pressure"], errors="coerce")
     df = df.dropna(subset=["pressure"])
-    df = df.drop("wind_speed", axis = 1)
+    df = df.drop("wind_speed", axis=1)
+    
     st.sidebar.header("Plotting Options")
 
     # Sidebar: Select variable to plot
@@ -29,8 +28,7 @@ def plot_filtered_data():
         value=(min_sol, max_sol)
     )
 
-
-    # Filter data based on pressure range
+    # Filter data based on sol range
     filtered_df = df[df["sol"].between(*sol_range)]
 
     # Plot the selected variable
@@ -45,10 +43,16 @@ def plot_filtered_data():
     )
     st.plotly_chart(fig)
 
-    # Display filtered results
-    st.write(f"Filtered Data (Sol between {sol_range[0]} and {sol_range[1]} ):")
-    st.dataframe(filtered_df)
+    # Display filtered data and summary statistics side by side
+    col1, col2 = st.columns(2)
 
-    # Display summary statistics
-    st.write("Summary Statistics:")
-    st.write(filtered_df.describe())
+    with col1:
+        st.write(f"Filtered Data (Sol between {sol_range[0]} and {sol_range[1]}):")
+        st.dataframe(filtered_df)
+
+    with col2:
+        st.write("Summary Statistics:")
+        st.write(filtered_df.describe())
+
+# Call the function
+plot_filtered_data()

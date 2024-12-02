@@ -5,7 +5,7 @@ import time
 import random
 
 # Date d'hier
-yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+yesterday = (datetime.datetime.now() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
 
 # Fonction pour récupérer les images de la date d'hier
 def get_images_for_date(date):
